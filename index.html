@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10월 식단 비교</title>
+<style>
+  :root{
+    --bg:#faf8f5; --card:#fff; --ink:#2b2b2b; --muted:#8a8a8a; --line:#e9e4dc;
+    --ju:#e8590c; --ju-bg:#fff1e8;
+    --gu:#0b7285; --gu-bg:#e6f6f8;
+    --share:#fff3bf; --share-line:#f0c419;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.45}
+  header{padding:18px 14px 8px;max-width:980px;margin:0 auto}
+  h1{margin:0;font-size:22px}
+  .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  nav.pages{max-width:980px;margin:6px auto 0;padding:0 14px;display:flex;gap:6px}
+  nav.pages button{border:0;background:none;padding:8px 12px;font-size:14px;border-bottom:3px solid transparent;color:var(--muted);cursor:pointer}
+  nav.pages button.on{color:var(--ink);border-color:var(--ink);font-weight:700}
+  .bar{max-width:980px;margin:8px auto;padding:0 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .weeks{display:flex;gap:6px;flex-wrap:wrap}
+  .weeks button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+  .weeks button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .opts{margin-left:auto;display:flex;gap:12px;font-size:13px;color:var(--muted)}
+  .opts label{cursor:pointer;display:flex;align-items:center;gap:4px}
+  main{max-width:980px;margin:0 auto;padding:0 14px 40px}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;margin:6px 0 10px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
+  .day{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+  .day.today{border:2px solid var(--ink)}
+  .dayhead{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px 12px;background:#f4f0ea;font-weight:700}
+  .dayhead .dow{font-weight:400;color:var(--muted)}
+  .badge{font-size:11px;font-weight:600;border-radius:999px;padding:2px 8px;background:#e5e1da;color:#555}
+  .badge.ju{background:var(--ju-bg);color:var(--ju)}
+  .badge.gu{background:var(--gu-bg);color:var(--gu)}
+  .todaytag{margin-left:auto;font-size:11px;background:var(--ink);color:#fff;border-radius:999px;padding:2px 8px}
+  .cols{display:grid;grid-template-columns:1fr 1fr}
+  .col{padding:10px 12px;font-size:13.5px}
+  .col + .col{border-left:1px solid var(--line)}
+  .who{font-weight:700;font-size:13px;margin-bottom:6px}
+  .col.ju .who{color:var(--ju)} .col.gu .who{color:var(--gu)}
+  .who small{font-weight:400;color:var(--muted);margin-left:4px}
+  ul{margin:0;padding:0;list-style:none}
+  li{padding:1px 0}
+  li.main{font-weight:600}
+  .snack{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);color:#555;font-size:12.5px}
+  .snack b{color:var(--muted);font-weight:600;margin-right:3px}
+  .kcal{margin-top:6px;font-size:12px;color:var(--muted)}
+  .chips{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+  .chip{font-size:11.5px;border-radius:6px;padding:1px 6px;background:#f1efeb;color:#666}
+  .chip.share{background:var(--share);color:#7a5c00;border:1px solid var(--share-line);font-weight:700}
+  .off{color:var(--muted)}
+  .hide-snack .snack{display:none}
+  .hide-chips .chips{display:none}
+  .note{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6}
+  @media (max-width:520px){
+    .col{padding:8px 8px;font-size:12.5px}
+    .opts{margin-left:0}
+  }
+  /* 두 번째 페이지 */
+  .sum{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+  .sumbox{flex:1 1 150px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:13px}
+  .sumbox b{font-size:20px;display:block}
+  .sumbar{height:6px;border-radius:3px;background:#eee;margin-top:6px;overflow:hidden}
+  .sumbar i{display:block;height:100%;background:var(--ink)}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+  .btn{border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:10px;padding:8px 14px;font-size:13px;cursor:pointer}
+  .btn.ghost{background:#fff;color:var(--ink)}
+  .plan-body{padding:10px 12px}
+  .opts3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .opt{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 4px;font-size:12.5px;cursor:pointer;text-align:center;line-height:1.3}
+  .opt .em{display:block;font-size:20px}
+  .opt.on{border:2px solid var(--ink);background:#f4f0ea;font-weight:700}
+  .opt.warn.on{border-color:#e03131;background:#fff5f5}
+  .pnote{font-size:12px;color:#555;margin-top:6px}
+  .pnote.w{color:#c92a2a}
+  .refs{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;align-items:center;font-size:11.5px;color:var(--muted)}
+  .dinner{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--muted)}
+  .lenpick{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .lenpick select{font-size:13px;padding:6px 8px;border-radius:8px;border:1px solid var(--line)}
+  .din{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:13px}
+  .din .t{font-weight:700;color:#364fc7;margin-bottom:4px}
+  .drow{display:flex;gap:6px;align-items:baseline;padding:1px 0}
+  .dcat{flex:0 0 56px;color:var(--muted);font-size:11.5px}
+  .dnew{font-size:10.5px;background:var(--share);color:#7a5c00;border-radius:999px;padding:0 6px;margin-left:4px;border:1px solid var(--share-line)}
+  .dk{font-size:11px;color:var(--muted);margin-left:4px}
+  .edited{font-size:11px;background:#e5e1da;color:#555;border-radius:999px;padding:2px 8px}
+  /* 장보기 */
+  .h2{font-size:15px;margin:16px 0 6px}
+  .mrow{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:6px;font-size:12.5px;line-height:1.6}
+  .mrow b{margin-right:6px}
+  .mrow .lbl{color:var(--muted);margin:0 4px 0 8px;font-size:11.5px}
+  .mrow.today{border:2px solid var(--ink)}
+  .ssec{background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
+  .ssec h3{margin:0;padding:8px 12px;font-size:13.5px;background:#f4f0ea}
+  .srow{display:flex;gap:8px;align-items:flex-start;padding:8px 12px;border-top:1px solid var(--line)}
+  .srow:first-of-type{border-top:0}
+  .srow input{margin-top:3px;width:18px;height:18px}
+  .srow .nm{font-weight:600;font-size:14px}
+  .srow .cnt{font-size:11.5px;color:#7a5c00;background:var(--share);border:1px solid var(--share-line);border-radius:999px;padding:0 7px;margin-left:6px}
+  .srow .use{font-size:12px;color:var(--muted);margin-top:1px}
+  .srow.done .nm{text-decoration:line-through;color:var(--muted)}
+  /* 요리 목록 */
+  .addbox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:6px}
+  .addbox label.f{display:block;font-size:12.5px;color:var(--muted);margin:8px 0 3px}
+  .addbox input[type=text]{width:100%;font-size:14px;padding:9px 10px;border:1px solid var(--line);border-radius:10px}
+  .addbox .chks{display:flex;flex-wrap:wrap;gap:14px;font-size:13.5px;margin:2px 0}
+  .addbox .chks label{display:flex;align-items:center;gap:5px;cursor:pointer}
+  .dish{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:6px}
+  .dish.off{background:#f7f5f1;opacity:.75}
+  .dish .dtop{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:14px;cursor:pointer}
+  .dish .dtop input{width:18px;height:18px}
+  .dish .use{margin-top:2px}
+  .dbtn{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 9px;font-size:12px;cursor:pointer}
+  .okmsg{font-size:12.5px;margin-top:8px;color:#2b8a3e}
+  .errmsg{color:#c92a2a}
+  .page{display:none}.page.on{display:block}
+</style>
+</head>
+<body>
+<header>
+  <h1>🍚 10월 식단 비교</h1>
+  <div class="sub">2026년 10월 · 주은(어린이집) vs 규리(유치원)</div>
+</header>
+
+<nav class="pages" id="pages">
+  <button class="on" data-p="compare">식단 비교</button>
+  <button data-p="bf">☀️ 아침</button>
+  <button data-p="dn">🌙 저녁</button>
+  <button data-p="dish">🍳 요리 목록</button>
+  <button data-p="shop">🛒 장보기</button>
+</nav>
+
+<div class="page on" id="p-compare">
+  <div class="bar">
+    <div class="weeks" id="weeks"></div>
+    <div class="opts">
+      <label><input type="checkbox" id="optSnack" checked> 간식</label>
+      <label><input type="checkbox" id="optChips" checked> 재료 태그</label>
+    </div>
+  </div>
+  <main id="main">
+    <div class="legend">
+      <span><span class="dot" style="background:var(--ju)"></span>주은 · 어린이집</span>
+      <span><span class="dot" style="background:var(--gu)"></span>규리 · 유치원</span>
+      <span><span class="dot" style="background:var(--share-line)"></span>같은 날 겹치는 재료</span>
+    </div>
+    <div id="list"></div>
+    <div class="note">
+      * 어린이집은 오전간식·점심·오후간식과 열량/단백질, 유치원은 점심만 있는 식단표예요.<br>
+      * 식단은 식재료 수급 등의 사정으로 변경될 수 있어요.<br>
+      * 재료 태그는 메뉴 이름에서 자동으로 뽑은 것이라 참고용이에요(알레르기 번호는 아직 넣지 않았어요).
+    </div>
+  </main>
+</div>
+
+<div class="page" id="p-bf">
+  <div class="bar"><div class="weeks" id="weeksB"></div></div>
+  <main>
+    <div class="sum" id="sumB"></div>
+    <div class="actions">
+      <button class="btn" id="btnRe">🔀 다시 짜기</button>
+      <button class="btn ghost" id="btnReset">✋ 직접 고른 것 모두 해제</button>
+    </div>
+    <div id="bfList"></div>
+    <div class="note">
+      * 아침은 <b>누룽지+계란후라이 · 삶은 달걀 · 볶음밥</b>을 고르게 나누고, 같은 날 점심·간식과 겹치는 재료는 피해서 짜요.<br>
+      * 카드의 버튼을 누르면 그날만 직접 바꿀 수 있어요(다시 짜기를 해도 직접 고른 날은 그대로 둬요).<br>
+      * 주말(토·일)은 볶음밥으로 기본 설정했고, 평일 배분은 평일끼리 고르게 맞춰요. 주말에 다른 메뉴를 먹는 날은 버튼으로 바꾸면 돼요.
+    </div>
+  </main>
+</div>
+
+<div class="page" id="p-dn">
+  <div class="bar"><div class="weeks" id="weeksD"></div></div>
+  <main>
+    <div class="sum" id="sumD"></div>
+    <div class="actions">
+      <button class="btn" id="btnDin" style="background:#364fc7;border-color:#364fc7">🔀 저녁 다시 짜기</button>
+      <label class="lenpick">한 번 한 반찬 먹는 기간
+        <select id="batchLen"><option value="2">2일</option><option value="3">3일</option><option value="4">4일</option></select>
+      </label>
+      <label class="lenpick"><input type="checkbox" id="onlyMine"> 알려주신 메뉴만 쓰기</label>
+    </div>
+    <div id="dnList"></div>
+    <div class="note">
+      * 저녁은 국 포함 <b>4가지</b>(국·찌개 1, 메인 1, 밑반찬 2)이고, 밥·배추김치는 기본이에요.<br>
+      * 그날 주은·규리 점심과 재료·메뉴가 겹치지 않게 하고, 한 번 만든 반찬은 만든 날부터 최대 3일까지만(만든 날 포함) 이어서 먹어요.<br>
+      * 알려주신 14가지를 먼저 쓰고, 점심과 겹쳐서 쓸 수 없는 날만 초안 추가 메뉴로 채워요. 고춧가루가 들어가는 음식은 뺐어요.
+    </div>
+  </main>
+</div>
+
+<div class="page" id="p-dish">
+  <main style="padding-top:10px">
+    <h2 class="h2" style="margin-top:4px">➕ 만들 수 있는 요리 추가</h2>
+    <div class="addbox">
+      <label class="f" for="dName">요리 이름</label>
+      <input type="text" id="dName" placeholder="예: 감자전">
+      <label class="f">들어갈 자리 (여러 개 골라도 돼요)</label>
+      <div class="chks">
+        <label><input type="checkbox" id="dC_soup"> 국·찌개</label>
+        <label><input type="checkbox" id="dC_main"> 메인</label>
+        <label><input type="checkbox" id="dC_side" checked> 밑반찬</label>
+      </div>
+      <label class="f" for="dIngs">사야 하는 재료 (쉼표로 구분, 기본 양념은 안 적어도 돼요)</label>
+      <input type="text" id="dIngs" placeholder="예: 감자, 부침가루">
+      <div class="chks" style="margin-top:8px"><label><input type="checkbox" id="dSpicy"> 🌶 고춧가루가 들어가요 (식단에서 제외)</label></div>
+      <div class="actions" style="margin:10px 0 0"><button class="btn" id="dAdd">추가하기</button></div>
+      <div id="dMsg"></div>
+    </div>
+    <div class="note" style="margin-top:6px">요리를 추가·삭제하거나 쓰고 빼면 <b>저녁 식단과 장보기 목록이 바로 새로 짜져요.</b> 직접 추가한 요리는 알려주신 메뉴처럼 먼저 쓰여요.</div>
+    <h2 class="h2">🍽 요리 목록</h2>
+    <div class="sum" id="sumDish"></div>
+    <div id="dishList"></div>
+  </main>
+</div>
+
+<div class="page" id="p-shop">
+  <div class="bar">
+    <label class="lenpick">장 보는 날 <select id="shopSel"></select></label>
+    <div class="opts">
+      <label><input type="checkbox" id="shopBf" checked> 아침</label>
+      <label><input type="checkbox" id="shopDin" checked> 저녁</label>
+    </div>
+  </div>
+  <main>
+    <div class="sum" id="sumS"></div>
+    <div class="actions">
+      <button class="btn" id="btnCopy">📋 안 산 것 복사</button>
+      <button class="btn ghost" id="btnUncheck">☑ 체크 모두 해제</button>
+      <span id="copyMsg" class="sub" style="align-self:center"></span>
+    </div>
+    <h2 class="h2">🛒 장봐야 할 재료</h2>
+    <div id="shopList"></div>
+    <h2 class="h2">📅 이 장으로 먹는 메뉴</h2>
+    <div id="shopMenu"></div>
+    <div class="note">
+      * 일요일 낮에 장을 보니까, <b>장 보는 날 저녁부터 다음 주 토요일 저녁까지</b>의 저녁과 <b>월요일부터 다음 일요일 아침까지</b>의 아침(다음 장 보기 전)을 기준으로 모았어요.<br>
+      * <b>새로 만드는 요리(🆕)</b>의 재료만 담았어요. 이미 만들어 둔 반찬을 이어 먹는 날은 따로 사지 않아요.<br>
+      * 소금·간장·참기름·식용유·마늘·깨 같은 기본 양념은 뺐어요. 양은 식구 수에 따라 달라서 쓰이는 횟수만 보여줘요.<br>
+      * 볶음밥은 양파·당근·달걀을 넣는 걸로 가정했어요. 체크 표시는 이 기기의 브라우저에만 저장돼요.
+    </div>
+  </main>
+</div>
+
+<script>
+// ===== 데이터 =====
+// 주은(어린이집): am 오전간식, lunch 점심, pm 오후간식, kcal 열량, pro 단백질
+// 규리(유치원): lunch 점심, tag 특별한 날
+const DOW = ['일','월','화','수','목','금','토'];
+const JU = {
+  1:{am:'우유미숫가루',lunch:['기장밥','맑은콩나물국','소고기채소볶음','파프리카무침','배추김치'],pm:'찐고구마/차',kcal:417.8,pro:18.9},
+  2:{am:'배',lunch:['백미밥','꽃게된장국','너비아니구이','새송이버섯나물','깍두기'],pm:'우리밀쿠키/우유',kcal:409.6,pro:14},
+  5:{off:'대체휴일'},
+  6:{tag:'채식의 날',am:'사과',lunch:['보리밥','순두부맑은국','닭살채소조림','숙주나물','배추김치'],pm:'꽈배기빵/우유',kcal:421.7,pro:17.3},
+  7:{am:'바나나/우유',lunch:['백미밥','소고기미역국','달걀당근찜','무나물','배추김치'],pm:'김가루주먹밥/차',kcal:411.6,pro:14.6},
+  8:{am:'메론/우유',lunch:['현미찹쌀밥','황태국','돈육간장불고기','상추무침','깍두기'],pm:'찐달걀/매실차',kcal:404.8,pro:17.9},
+  9:{off:'한글날'},
+  12:{am:'사과',lunch:['백미밥','순살감자탕','어묵채소조림','파프리카볶음','배추김치'],pm:'달걀토스트/요구르트',kcal:432.7,pro:17.1},
+  13:{am:'누룽지죽',lunch:['흑미밥','아욱된장국','닭살양배추볶음','브로콜리무침','깍두기'],pm:'찐고구마/우유',kcal:419.3,pro:14.1},
+  14:{tag:'국 없는 날',am:'배',lunch:['카레라이스','새우튀김','단무지무침','배추김치'],pm:'미니약과/우유',kcal:426.1,pro:16.4},
+  15:{am:'시리얼/우유',lunch:['기장밥','모둠버섯국','순살코다리강정','고사리나물','깍두기'],pm:'찐단호박/짜먹는요구르트',kcal:426.4,pro:22.8},
+  16:{am:'샤인머스캣/우유',lunch:['백미밥','맑은육개장','메추리알감자조림','오이무침','배추김치'],pm:'미니우동',kcal:402.3,pro:14.2},
+  19:{am:'사과',lunch:['백미밥','바지락살부추국','훈제오리채소찜','연근조림','배추김치'],pm:'카스테라/우유',kcal:414.5,pro:14.6},
+  20:{am:'떠먹는요구르트',lunch:['보리밥','사골곰국/소면','두부새송이버섯조림','청경채나물','깍두기'],pm:'구운달걀/배즙',kcal:420.7,pro:20.9},
+  21:{am:'바나나',lunch:['훈제오리볶음밥','동그랑땡전','숙주나물무침','배추김치'],pm:'참치주먹밥/우유',kcal:426.5,pro:20.4},
+  22:{am:'채소스틱/치즈',lunch:['현미찹쌀밥','유부장국','소고기야채볶음','양상추요거트샐러드','깍두기'],pm:'모닝빵/크림스프',kcal:427.7,pro:16.3},
+  23:{tag:'저당데이',am:'배',lunch:['백미밥','들기름미역국','저당고등어조림','애호박나물','배추김치'],pm:'김말이튀김/차',kcal:400.3,pro:13.8},
+  26:{am:'사과',lunch:['백미밥','소고기대팟국','치즈달걀말이','오이나물','배추김치'],pm:'후레쉬번/우유',kcal:411.6,pro:15.8},
+  27:{am:'시리얼/우유',lunch:['흑미밥','닭살뭇국','브로콜리새우전','양배추나물','깍두기'],pm:'찐고구마/차',kcal:419.9,pro:16.4},
+  28:{am:'감',lunch:['채소다진돈육비빔밥/양념장','잔멸치조림','요구르트','깍두기'],pm:'쌀과자/우유',kcal:400.2,pro:17.3},
+  29:{am:'누룽지죽',lunch:['기장밥','순두부팽이버섯국','잘게자른오징어볶음','김자반','배추김치'],pm:'토마토스파게티',kcal:412.4,pro:22.4},
+  30:{am:'메론',lunch:['백미밥','어묵국','순살닭갈비','콩나물무침','배추김치'],pm:'찐감자/차',kcal:402.9,pro:18.3}
+};
+const GU = {
+  1:{tag:'생일축하식단',lunch:['친환경찹쌀밥','전복미역국','삼색나물무침','잡채볶음','쇠고기육전·파채무침','배추김치','과일(방울토마토)','생일축하케익','갑오징어·브로콜리&초장']},
+  2:{tag:'골고루먹는날',lunch:['친환경기장밥','떡국','숙주쑥갓나물','감자채볶음','생등심돈까스/소스','옥수수콘치즈구이','배추김치','과일(하우스감귤)']},
+  5:{off:'대체휴일'},
+  6:{lunch:['친환경차조밥','청국장찌개','감자조림','부추양파무침','우엉진미채볶음','오리로스불고기','배추김치','과일(사과)']},
+  7:{lunch:['친환경귀리밥','바지락실파국','가자미무조림','김치어묵볶음','건파래무침','닭살오븐구이/파채소스','배추김치','과일(샤인머스캣)']},
+  8:{lunch:['친환경수수밥','종합어묵국','새송이부추초무침','콩나물무침','잔멸치조림','제육불고기','배추김치','과일(배)','모듬쌈,야채/쌈장']},
+  9:{off:'한글날'},
+  12:{lunch:['볶음자반','친환경귀리밥','근대국','깻잎양념','목살간장불고기','배추김치','과일(멜론)','연두부/양념장']},
+  13:{lunch:['친환경현미밥','바지락살미역국','코다리강정조림','오이생채','감자채볶음','쇠고기야채불고기','배추김치','과일(하우스감귤)']},
+  14:{lunch:['친환경검정쌀밥','감자수제비국','도토리묵쑥갓무침','비엔나브로콜리볶음','쥐포채볶음','콩나물잡채','배추김치','과일(사과)','월미니요구르트']},
+  15:{lunch:['친환경압맥밥','얼갈이된장국','가마보꼬어묵조림','바베큐등갈비구이','숙주미나리무침','배추김치','과일(샤인머스캣)','양배추숙쌈,야채/쌈장']},
+  16:{tag:'희망급식의날',lunch:['채소자장밥','콩나물무침','수제탕수육/후르츠소스','배추김치','사과양배추샐러드','초코칩쿠키','식물성유산균요구르트']},
+  19:{lunch:['친환경혼합12곡밥','알토란탕','연근조림','유정란달걀찜','참나물무침','닭살불고기','배추김치','과일(사과)','야채,무쌈,파프리카(자율)/쌈장']},
+  20:{lunch:['친환경현미밥','로제파스타','육개장','미니새송이메추리알조림','애호박초무침','두부까스/소스','배추김치','과일(샤인머스캣)']},
+  21:{lunch:['친환경차조밥','된장찌개','어묵곤약조림','상추치커리생채','건강혼합멸치볶음','오리훈제야채볶음','배추김치','과일(방울토마토)']},
+  22:{lunch:['친환경찰보리밥','들깨우거지된장국','갈치무조림','쇠고기장똑똑이','김쪽파무침','오징어부추야채전','배추김치','과일(배)']},
+  23:{tag:'저탄소녹색급식의날',lunch:['친환경귀리밥','전복죽','치커리유자청무침','볶음우동','두부간장조림','왕새우튀김','배추김치','과일(하우스감귤)']},
+  26:{lunch:['친환경수수밥','뜨덕이만두국','고등어고사리조림','구운가지나물','수제떡갈비·양파채절임소스','배추김치','과일(단감)','어린이김']},
+  27:{lunch:['친환경압맥밥','미트볼라따뛰이','쇠고기미역국','콩나물생채','잔멸치볶음','참치달걀말이','배추김치','과일(하우스감귤)']},
+  28:{lunch:['친환경기장밥','들깨우거지된장국','감자조림','건파래무침','대패콩나물두루치기','배추김치','과일(사과)','모듬쌈,야채/쌈장']},
+  29:{lunch:['친환경찰보리밥','들기름막국수','맑은콩나물국','애호박초무침','쥐포채볶음','배추김치','토마토보코치니샐러드','과일(배)']},
+  30:{tag:'골고루먹는날',lunch:['김치볶음밥/어린이김','팽이버섯된장국','검은깨묵어린잎샐러드','웨지감자','닭봉오븐간장구이','배추김치','무피클','과일(바나나)']}
+};
+const WEEKS = [
+  {n:'1주차',days:[1,2]},
+  {n:'2주차',days:[5,6,7,8,9]},
+  {n:'3주차',days:[12,13,14,15,16]},
+  {n:'4주차',days:[19,20,21,22,23]},
+  {n:'5주차',days:[26,27,28,29,30]}
+];
+
+// ===== 재료 태그 =====
+const KEYS = [
+  ['소고기',['소고기','쇠고기','육전','육개장','사골','대팟국']],
+  ['돼지고기',['돈육','돈까스','제육','목살','등갈비','돼지','감자탕','대패']],
+  ['닭고기',['닭']],
+  ['오리',['오리']],
+  ['달걀',['달걀','유정란','메추리알','계란']],
+  ['생선',['고등어','갈치','가자미','코다리','멸치','황태','쥐포','참치']],
+  ['오징어',['오징어']],
+  ['새우',['새우']],
+  ['조개·꽃게',['바지락','꽃게','전복']],
+  ['두부',['두부']],
+  ['어묵',['어묵','가마보꼬']]
+];
+function tagsOf(lunch){
+  const s = new Set(); const t = lunch.join(' ');
+  KEYS.forEach(([name,ws])=>{ if(ws.some(w=>t.includes(w))) s.add(name); });
+  return s;
+}
+
+// ===== 화면 =====
+const MONTH = 10, YEAR = 2026;
+const wkEl = document.getElementById('weeks');
+const listEl = document.getElementById('list');
+const mainEl = document.getElementById('main');
+let cur = 0;
+
+const now = new Date();
+const todayD = (now.getFullYear()===YEAR && now.getMonth()+1===MONTH) ? now.getDate() : null;
+if(todayD){
+  // 오늘이 속한 주, 주말이면 다음 주
+  let i = WEEKS.findIndex(w=>w.days.includes(todayD));
+  if(i<0) i = WEEKS.findIndex(w=>w.days.some(d=>d>todayD));
+  cur = i>=0 ? i : WEEKS.length-1;
+}
+
+function renderWeeks(){
+  wkEl.innerHTML = '';
+  WEEKS.forEach((w,i)=>{
+    const b = document.createElement('button');
+    b.textContent = w.n;
+    if(i===cur) b.className='on';
+    b.onclick = ()=>{cur=i;renderWeeks();renderList();};
+    wkEl.appendChild(b);
+  });
+}
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+function colJu(d, share){
+  const x = JU[d];
+  if(x.off) return `<div class="col ju"><div class="who">주은<small>어린이집</small></div><div class="off">${esc(x.off)}</div></div>`;
+  const items = x.lunch.map((m,i)=>`<li class="${i<1?'main':''}">${esc(m)}</li>`).join('');
+  const chips = [...tagsOf(x.lunch)].map(t=>`<span class="chip ${share.has(t)?'share':''}">${t}</span>`).join('');
+  return `<div class="col ju"><div class="who">주은<small>어린이집</small></div>
+    <ul>${items}</ul>
+    <div class="snack"><b>오전</b>${esc(x.am)}<br><b>오후</b>${esc(x.pm)}</div>
+    <div class="kcal">${x.kcal} kcal · 단백질 ${x.pro}g</div>
+    <div class="chips">${chips}</div></div>`;
+}
+function colGu(d, share){
+  const x = GU[d];
+  if(x.off) return `<div class="col gu"><div class="who">규리<small>유치원</small></div><div class="off">${esc(x.off)}</div></div>`;
+  const items = x.lunch.map((m,i)=>`<li class="${i<1?'main':''}">${esc(m)}</li>`).join('');
+  const chips = [...tagsOf(x.lunch)].map(t=>`<span class="chip ${share.has(t)?'share':''}">${t}</span>`).join('');
+  return `<div class="col gu"><div class="who">규리<small>유치원</small></div>
+    <ul>${items}</ul>
+    <div class="chips">${chips}</div></div>`;
+}
+function renderList(){
+  listEl.innerHTML = '';
+  WEEKS[cur].days.forEach(d=>{
+    const date = new Date(YEAR, MONTH-1, d);
+    const dow = DOW[date.getDay()];
+    const j = JU[d], g = GU[d];
+    const share = new Set();
+    if(!j.off && !g.off){
+      const a = tagsOf(j.lunch), b = tagsOf(g.lunch);
+      a.forEach(t=>{ if(b.has(t)) share.add(t); });
+    }
+    const badges = [];
+    if(j.tag) badges.push(`<span class="badge ju">주은 ${esc(j.tag)}</span>`);
+    if(g.tag) badges.push(`<span class="badge gu">규리 ${esc(g.tag)}</span>`);
+    if(j.off) badges.push(`<span class="badge">${esc(j.off)}</span>`);
+    const el = document.createElement('section');
+    el.className = 'day' + (d===todayD ? ' today' : '');
+    el.innerHTML = `<div class="dayhead">${MONTH}/${d} <span class="dow">(${dow})</span>${badges.join('')}${d===todayD?'<span class="todaytag">오늘</span>':''}</div>
+      <div class="cols">${colJu(d,share)}${colGu(d,share)}</div>`;
+    listEl.appendChild(el);
+  });
+}
+document.getElementById('optSnack').onchange = e=>mainEl.classList.toggle('hide-snack',!e.target.checked);
+document.getElementById('optChips').onchange = e=>mainEl.classList.toggle('hide-chips',!e.target.checked);
+renderWeeks(); renderList();
+
+// ===== 페이지 전환 =====
+document.querySelectorAll('#pages button').forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll('#pages button').forEach(x=>x.classList.toggle('on',x===b));
+    document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.p));
+    if(b.dataset.p==='shop') renderShop();
+  };
+});
+
+// ===== 아침·저녁 공통 =====
+const BF = [
+  {id:'nurungji', name:'누룽지 + 계란후라이', em:'🍳', egg:true},
+  {id:'boiled',   name:'삶은 달걀',           em:'🥚', egg:true},
+  {id:'friedrice',name:'볶음밥',               em:'🍚', egg:false}
+];
+const EGG_RE = /달걀|계란|메추리알|유정란/;
+const PLAN_DAYS = Array.from({length:31},(_,i)=>i+1);   // 10월 1~31일 (주말 포함)
+const WEEKS2 = [
+  {n:'1주차',days:[1,2,3,4]},
+  {n:'2주차',days:[5,6,7,8,9,10,11]},
+  {n:'3주차',days:[12,13,14,15,16,17,18]},
+  {n:'4주차',days:[19,20,21,22,23,24,25]},
+  {n:'5주차',days:[26,27,28,29,30,31]}
+];
+function isWeekend(d){ const w=new Date(YEAR,MONTH-1,d).getDay(); return w===0||w===6; }
+
+function dayInfo(d){
+  const j = JU[d], g = GU[d];
+  if(!j) return {egg:false, nurung:false, rice:false, off:true};   // 주말: 어린이집·유치원 식단 없음
+  let txt = '';
+  if(!j.off) txt += j.am+' '+j.lunch.join(' ')+' '+j.pm+' ';
+  if(!g.off) txt += g.lunch.join(' ');
+  return {egg:EGG_RE.test(txt), nurung:txt.includes('누룽지'), rice:/볶음밥/.test(txt), off:!!j.off};
+}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+
+const KEY = 'sikdan-plan-v2';
+let st = null;
+try{ st = JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ st = null; }
+
+// ----- 아침 -----
+function makePlan(seed, locked){
+  const rnd = mulberry32(seed*7919+13);
+  const count = {nurungji:0,boiled:0,friedrice:0};
+  const plan = {};
+  let prev=null, prev2=null;
+  PLAN_DAYS.forEach(d=>{
+    let pick;
+    const wkend = isWeekend(d);
+    if(locked[d]) pick = locked[d];
+    else if(wkend) pick = 'friedrice';          // 주말은 거의 볶음밥
+    else{
+      const info = dayInfo(d);
+      let best = 1e9;
+      BF.forEach(o=>{
+        let c = count[o.id]*1.2 + rnd()*0.8;
+        if(o.egg && info.egg) c += 2.5;
+        if(o.id==='nurungji' && info.nurung) c += 4;
+        if(o.id==='friedrice' && info.rice) c += 4;
+        if(o.id===prev) c += 5;
+        if(o.id===prev2) c += 0.8;
+        if(c<best){best=c;pick=o.id;}
+      });
+    }
+    plan[d]=pick; if(!wkend) count[pick]++; prev2=prev; prev=pick;   // 균형은 평일끼리 맞춤
+  });
+  return plan;
+}
+if(!st || !st.plan){ st = {seed:1, edited:{}, plan:null}; st.plan = makePlan(st.seed, st.edited); }
+if(st.dseed==null) st.dseed=1;
+if(!st.batch) st.batch=3;
+if(st.only==null) st.only=false;
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} }
+
+// ----- 저녁 (국 포함 4가지) -----
+const DINNER_CATS = [
+  {id:'soup', name:'국·찌개', pool:'soup', off:1},
+  {id:'main', name:'메인',    pool:'main', off:0},
+  {id:'side', name:'밑반찬',  pool:'side', off:2},
+  {id:'side2',name:'밑반찬',  pool:'side', off:3}
+];
+// D(이름, 들어갈 칸, 재료태그(점심과 비교), 비교용 키워드, 알려주신 메뉴인지)
+const D = (name,cats,tags,kw,mine)=>({name,cats,tags,kw,mine});
+const DISHES = [
+  // ── 알려주신 메뉴 ──
+  D('콩나물무침',['side'],[],['콩나물'],true),
+  D('숙주나물무침',['side'],[],['숙주'],true),
+  D('시금치무침',['side'],[],['시금치'],true),
+  D('멸치볶음',['side'],['생선'],['멸치'],true),
+  D('두부부침',['side','main'],['두부'],['두부'],true),
+  D('소고기미역국',['soup'],['소고기'],['미역'],true),
+  D('계란만두국',['soup'],['달걀'],['만두','달걀','계란'],true),
+  D('오이냉채',['side'],[],['오이'],true),
+  D('미역줄기볶음',['side'],[],['미역'],true),
+  D('등갈비',['main'],['돼지고기'],['갈비'],true),
+  D('소고기불고기',['main'],['소고기'],[],true),
+  D('콩나물국',['soup'],[],['콩나물'],true),
+  D('양배추전',['side','main'],[],['양배추'],true),
+  D('육전',['main'],['소고기'],['육전'],true),
+  // ── 제가 초안으로 넣은 추가 메뉴 (고춧가루 들어가는 음식은 뺐어요) ──
+  D('고등어구이',['main'],['생선'],['고등어'],false),
+  D('연어구이',['main'],['생선'],['연어'],false),
+  D('새우볶음',['main'],['새우'],['새우'],false),
+  D('달걀말이',['main'],['달걀'],['달걀','계란'],false),
+  D('동그랑땡',['main'],['돼지고기'],['동그랑땡'],false),
+  D('함박스테이크',['main'],['소고기','돼지고기'],['함박'],false),
+  D('돈까스',['main'],['돼지고기'],['돈까스','돈가스'],false),
+  D('소고기장조림',['main'],['소고기'],['장조림'],false),
+  D('삼겹살구이',['main'],['돼지고기'],['삼겹'],false),
+  D('감자채볶음',['side'],[],['감자'],false),
+  D('애호박볶음',['side'],[],['애호박'],false),
+  D('어묵볶음',['side'],['어묵'],['어묵'],false),
+  D('계란찜',['side'],['달걀'],['달걀','계란'],false),
+  D('브로콜리무침',['side'],[],['브로콜리'],false),
+  D('연근조림',['side'],[],['연근'],false),
+  D('가지볶음',['side'],[],['가지'],false),
+  D('단호박조림',['side'],[],['단호박'],false),
+  D('버섯볶음',['side'],[],['버섯'],false),
+  D('양배추볶음',['side'],[],['양배추'],false),
+  D('김자반볶음',['side'],[],['김자반'],false),
+  D('우엉조림',['side'],[],['우엉'],false),
+  D('고사리나물',['side'],[],['고사리'],false),
+  D('청경채나물',['side'],[],['청경채'],false),
+  D('파프리카볶음',['side'],[],['파프리카'],false),
+  D('된장찌개',['soup'],[],['된장'],false),
+  D('어묵탕',['soup'],['어묵'],['어묵'],false),
+  D('계란국',['soup'],['달걀'],['달걀','계란'],false),
+  D('북어국',['soup'],['생선'],['북어','황태'],false),
+  D('소고기뭇국',['soup'],['소고기'],['뭇국','무국'],false),
+  D('감자국',['soup'],[],['감자'],false),
+  D('시금치된장국',['soup'],[],['시금치','된장'],false),
+  D('떡국',['soup'],[],['떡국'],false),
+  D('아욱국',['soup'],[],['아욱'],false),
+  D('닭곰탕',['soup'],['닭고기'],['닭'],false)
+];
+
+function lunchInfo(d){
+  const j=JU[d], g=GU[d], L=[];
+  if(j && !j.off) L.push(...j.lunch);
+  if(g && !g.off) L.push(...g.lunch);
+  return {text:L.join(' '), tags:tagsOf(L)};
+}
+function conflict(dish,d){
+  const li = lunchInfo(d);
+  return dish.tags.some(t=>li.tags.has(t)) || dish.kw.some(k=>li.text.includes(k));
+}
+function makeDinner(seed, maxLen, onlyMine){
+  const rnd = mulberry32(seed*104729+7);
+  const out = {}; PLAN_DAYS.forEach(d=>out[d]={});
+  const cursor = {}; DINNER_CATS.forEach(c=>cursor[c.id]=1);
+  const lastUsed = {}, tagUse = {};
+  const order = ['main','side','side2','soup'];
+  const N = PLAN_DAYS.length;
+  PLAN_DAYS.forEach(d=>{
+    order.forEach(cid=>{
+      if(cursor[cid]!==d) return;
+      const cat = DINNER_CATS.find(c=>c.id===cid);
+      const want = Math.min(d===1 ? Math.max(1,maxLen-cat.off) : maxLen, N-d+1);
+      let best=null, bestScore=1e9;
+      activeDishes().filter(x=>x.cats.includes(cat.pool) && (!onlyMine || x.mine)).forEach(dish=>{
+        let vl=0;
+        while(vl<want && !conflict(dish,d+vl)) vl++;
+        // 같은 날 다른 칸과 같은 메뉴가 겹치면 거기서 끊음
+        for(let i=0;i<vl;i++){
+          if(order.some(oc=>oc!==cid && out[d+i][oc] && out[d+i][oc].name===dish.name)){ vl=i; break; }
+        }
+        if(vl===0) return;
+        let s = (want-vl)*3 + rnd();
+        if(!dish.mine) s += 4;                                   // 알려주신 메뉴를 먼저 씀
+        if(lastUsed[dish.name]!=null){ const gap=d-lastUsed[dish.name]; if(gap<8) s += (8-gap)*2; }   // 가까운 날 반복은 되도록 피함
+        for(let i=0;i<vl;i++){
+          const other = out[d+i];
+          order.forEach(oc=>{
+            if(oc!==cid && other[oc]){
+              dish.tags.forEach(t=>{ if(other[oc].tags.includes(t)) s+=2.5; });
+              if(dish.kw.some(k=>other[oc].kw.includes(k))) s+=4;   // 같은 날 같은 재료(양배추전+양배추볶음 등)
+            }
+          });
+        }
+        dish.tags.forEach(t=>{ s += (tagUse[t]||0)*0.15; });
+        if(s<bestScore){bestScore=s;best={dish,vl};}
+      });
+      let dish, vl;
+      if(best){dish=best.dish; vl=best.vl;} else {dish={name:'(직접 정하기)',tags:[],kw:[],mine:true,none:true}; vl=1;}
+      for(let i=0;i<vl;i++) out[d+i][cid]={name:dish.name,tags:dish.tags,kw:dish.kw,mine:dish.mine,none:!!dish.none,k:i+1,len:vl};
+      lastUsed[dish.name]=d+vl-1;
+      dish.tags.forEach(t=>{ tagUse[t]=(tagUse[t]||0)+vl; });
+      cursor[cid]=d+vl;
+    });
+  });
+  return out;
+}
+let dinCache = {key:'', data:null};
+function getDinner(){
+  const key = st.dseed+'/'+st.batch+'/'+(st.only?1:0)+'/'+dishVer;
+  if(dinCache.key!==key) dinCache = {key, data:makeDinner(st.dseed, st.batch, !!st.only)};
+  return dinCache.data;
+}
+
+// ----- 화면 -----
+let cur2 = 0;
+if(todayD){
+  const i2 = WEEKS2.findIndex(w=>w.days.includes(todayD));
+  cur2 = i2>=0 ? i2 : 0;
+}
+function renderWeeksAll(){
+  ['weeksB','weeksD'].forEach(id=>{
+    const el = document.getElementById(id);
+    el.innerHTML='';
+    WEEKS2.forEach((w,i)=>{
+      const b=document.createElement('button');
+      b.textContent=w.n; if(i===cur2) b.className='on';
+      b.onclick=()=>{cur2=i;renderWeeksAll();renderBf();renderDn();};
+      el.appendChild(b);
+    });
+  });
+}
+function dayHead(d, extra){
+  const date = new Date(YEAR, MONTH-1, d);
+  const dow = DOW[date.getDay()];
+  const j = JU[d];
+  const badges=[];
+  if(isWeekend(d)) badges.push('<span class="badge">주말</span>');
+  if(j && j.off) badges.push(`<span class="badge">${esc(j.off)}</span>`);
+  if(extra) badges.push(extra);
+  return `<div class="dayhead">${MONTH}/${d} <span class="dow">(${dow})</span>${badges.join('')}${d===todayD?'<span class="todaytag">오늘</span>':''}</div>`;
+}
+function chipsOf(x,label){
+  return (!x || x.off) ? '' :
+    `<span>${label}</span>`+[...tagsOf(x.lunch)].map(t=>`<span class="chip">${t}</span>`).join('');
+}
+function refsHtml(d){
+  if(isWeekend(d)) return '<div class="refs"><span>주말 · 어린이집/유치원 급식 없음</span></div>';
+  return `<div class="refs">${chipsOf(JU[d],'주은 점심')}${chipsOf(GU[d],'규리 점심')}</div>`;
+}
+
+// 아침
+function noteFor(d,id){
+  const i = dayInfo(d), o = BF.find(x=>x.id===id);
+  const warn=[], ok=[];
+  if(o.egg && i.egg) warn.push('점심·간식에도 달걀이 있어요');
+  if(id==='nurungji' && i.nurung) warn.push('간식에 누룽지죽이 있어요');
+  if(id==='friedrice' && i.rice) warn.push('점심에도 볶음밥이 있어요');
+  if(id==='friedrice' && i.egg) ok.push('점심·간식에 달걀이 있어서 달걀 없는 볶음밥으로 했어요');
+  if(o.egg && i.rice) ok.push('점심에 볶음밥이 있어서 아침은 달걀로 했어요');
+  if(id!=='nurungji' && i.nurung) ok.push('간식에 누룽지죽이 있어서 누룽지는 피했어요');
+  return {warn, ok};
+}
+function renderBf(){
+  const cnt = {nurungji:0,boiled:0,friedrice:0};
+  const wd = {nurungji:0,boiled:0,friedrice:0};
+  PLAN_DAYS.forEach(d=>{ cnt[st.plan[d]]++; if(!isWeekend(d)) wd[st.plan[d]]++; });
+  const total = PLAN_DAYS.length;
+  document.getElementById('sumB').innerHTML = BF.map(o=>
+    `<div class="sumbox">${o.em} ${o.name}<b>${cnt[o.id]}일</b><small style="color:var(--muted)">평일 ${wd[o.id]} · 주말 ${cnt[o.id]-wd[o.id]}</small><div class="sumbar"><i style="width:${cnt[o.id]/total*100}%"></i></div></div>`).join('');
+
+  const list = document.getElementById('bfList');
+  list.innerHTML='';
+  WEEKS2[cur2].days.forEach(d=>{
+    const id=st.plan[d];
+    const {warn,ok} = noteFor(d,id);
+    const el = document.createElement('section');
+    el.className='day'+(d===todayD?' today':'');
+    el.innerHTML = dayHead(d, st.edited[d] ? '<span class="edited">직접 고름</span>' : '') + `
+      <div class="plan-body">
+        <div class="opts3">${BF.map(o=>{
+          const w = noteFor(d,o.id).warn.length>0;
+          return `<button class="opt${o.id===id?' on':''}${w?' warn':''}" data-d="${d}" data-o="${o.id}"><span class="em">${o.em}</span>${o.name}</button>`;
+        }).join('')}</div>
+        ${warn.map(t=>`<div class="pnote w">⚠ ${t}</div>`).join('')}
+        ${ok.map(t=>`<div class="pnote">✓ ${t}</div>`).join('')}
+        ${refsHtml(d)}
+      </div>`;
+    list.appendChild(el);
+  });
+  list.querySelectorAll('.opt').forEach(b=>{
+    b.onclick=()=>{
+      const d=+b.dataset.d;
+      st.plan[d]=b.dataset.o; st.edited[d]=b.dataset.o;
+      save(); renderBf();
+    };
+  });
+}
+
+// 저녁
+function renderDn(){
+  const D = getDinner();
+  let cooks=0, mineCooks=0, none=0; const names=new Set();
+  PLAN_DAYS.forEach(d=>DINNER_CATS.forEach(c=>{ const x=D[d][c.id]; if(x.k===1){ cooks++; if(x.mine) mineCooks++; } if(x.none) none++; names.add(x.name); }));
+  document.getElementById('sumD').innerHTML =
+    `<div class="sumbox">🔪 새로 만드는 요리<b>${cooks}번</b><small style="color:var(--muted)">알려주신 메뉴 ${mineCooks}번 · 초안 추가 ${cooks-mineCooks}번${none?' · 빈칸 '+none+'칸':''}</small></div>
+     <div class="sumbox">📋 서로 다른 메뉴<b>${names.size}가지</b><small style="color:var(--muted)">같은 메뉴가 가까운 날 반복되는 건 되도록 피해요</small></div>`;
+
+  const list = document.getElementById('dnList');
+  list.innerHTML='';
+  WEEKS2[cur2].days.forEach(d=>{
+    const x = D[d];
+    const rows = DINNER_CATS.map(c=>{
+      const y = x[c.id];
+      const lab = y.k===1
+        ? '<span class="dnew">🆕 새로 만듦</span>'
+        : `<span class="dk">${y.k}일째${y.k===y.len?' · 마지막':''}</span>`;
+      const ex = (!y.mine && !y.none) ? '<span class="dk"> · 초안 추가 메뉴</span>' : '';
+      const nm = y.none ? `<span style="color:#c92a2a">${esc(y.name)} · 점심과 안 겹치는 메뉴가 없어요</span>` : esc(y.name);
+      return `<div class="drow"><span class="dcat">${c.name}</span><span>${nm}${ex}${y.none?'':lab}</span></div>`;
+    }).join('');
+    const fresh = DINNER_CATS.filter(c=>x[c.id].k===1).map(c=>x[c.id].name);
+    const el = document.createElement('section');
+    el.className='day'+(d===todayD?' today':'');
+    el.innerHTML = dayHead(d,'') + `
+      <div class="plan-body">
+        ${rows}
+        <div class="pnote" style="margin-top:8px">🔪 오늘 새로 만들 것: ${fresh.length?esc(fresh.join(', ')):'없음 (있는 반찬으로)'} · 밥·배추김치 기본</div>
+        ${refsHtml(d)}
+      </div>`;
+    list.appendChild(el);
+  });
+}
+
+// ----- 버튼 -----
+document.getElementById('btnRe').onclick=()=>{
+  st.seed++; st.plan = makePlan(st.seed, st.edited); save(); renderBf();
+};
+document.getElementById('btnReset').onclick=()=>{
+  st.edited={}; st.seed++; st.plan = makePlan(st.seed, st.edited); save(); renderBf();
+};
+const selLen = document.getElementById('batchLen');
+selLen.value = String(st.batch);
+selLen.onchange = ()=>{ st.batch = +selLen.value; save(); renderDn(); };
+document.getElementById('btnDin').onclick = ()=>{ st.dseed++; save(); renderDn(); };
+const chkOnly = document.getElementById('onlyMine');
+chkOnly.checked = !!st.only;
+chkOnly.onchange = ()=>{ st.only = chkOnly.checked; save(); renderDn(); };
+
+// ===== 장보기 =====
+const SECTIONS = ['🥩 정육','🐟 수산·해조류','🥬 채소','🥚 달걀·두부·가공','🧂 기타'];
+const ING_SEC = {};
+function sec(n, arr){ arr.forEach(x=>ING_SEC[x]=n); }
+sec(0,['소고기(국거리)','소고기(불고기용)','소고기(육전용)','소고기(장조림용)','다진 소고기','등갈비','다진 돼지고기','돈까스용 돼지고기','삼겹살','닭(백숙용)']);
+sec(1,['잔멸치','건미역','미역줄기','고등어','연어','새우','북어채','김자반']);
+sec(2,['콩나물','숙주','시금치','대파','오이','당근','양파','양배추','애호박','감자','가지','단호박','브로콜리','연근','우엉','청경채','파프리카','버섯','무','아욱','고사리']);
+sec(3,['달걀','메추리알','두부','만두','어묵','떡국떡','누룽지']);
+sec(4,['부침가루','빵가루','밀가루']);
+
+const DISH_ING = {
+  // 알려주신 메뉴
+  '콩나물무침':['콩나물','대파'], '숙주나물무침':['숙주','대파'], '시금치무침':['시금치'],
+  '멸치볶음':['잔멸치'], '두부부침':['두부'], '소고기미역국':['소고기(국거리)','건미역'],
+  '계란만두국':['만두','달걀','대파'], '오이냉채':['오이','당근'], '미역줄기볶음':['미역줄기','양파'],
+  '등갈비':['등갈비','양파','대파'], '소고기불고기':['소고기(불고기용)','양파','대파'],
+  '콩나물국':['콩나물','대파'], '양배추전':['양배추','달걀','부침가루'], '육전':['소고기(육전용)','달걀','부침가루'],
+  // 초안 추가 메뉴
+  '고등어구이':['고등어'], '연어구이':['연어'], '새우볶음':['새우','양파'], '달걀말이':['달걀','당근','대파'],
+  '동그랑땡':['다진 돼지고기','두부','양파','당근','달걀','부침가루'], '함박스테이크':['다진 소고기','다진 돼지고기','양파','달걀'],
+  '돈까스':['돈까스용 돼지고기','달걀','빵가루','밀가루'], '소고기장조림':['소고기(장조림용)','메추리알'], '삼겹살구이':['삼겹살'],
+  '감자채볶음':['감자','양파','당근'], '애호박볶음':['애호박','양파'], '어묵볶음':['어묵','양파','당근'],
+  '계란찜':['달걀','대파'], '브로콜리무침':['브로콜리'], '연근조림':['연근'], '가지볶음':['가지','양파'],
+  '단호박조림':['단호박'], '버섯볶음':['버섯','양파'], '양배추볶음':['양배추','당근'], '김자반볶음':['김자반'],
+  '우엉조림':['우엉','당근'], '고사리나물':['고사리'], '청경채나물':['청경채'], '파프리카볶음':['파프리카','양파'],
+  '된장찌개':['애호박','두부','양파','대파'], '어묵탕':['어묵','무','대파'], '계란국':['달걀','대파'],
+  '북어국':['북어채','무','대파'], '소고기뭇국':['소고기(국거리)','무','대파'], '감자국':['감자','양파','대파'],
+  '시금치된장국':['시금치','대파'], '떡국':['떡국떡','달걀','대파'], '아욱국':['아욱','대파'], '닭곰탕':['닭(백숙용)','대파']
+};
+const BF_ING = {nurungji:['누룽지','달걀'], boiled:['달걀'], friedrice:['양파','당근','달걀']};
+
+const SHOP_SUNDAYS = [-3,4,11,18,25];   // 장 보는 일요일(10월 기준 날짜, -3 = 9/27)
+function mdLabel(d){ const t=new Date(YEAR,MONTH-1,d); return `${t.getMonth()+1}/${t.getDate()}(${DOW[t.getDay()]})`; }
+// 일요일 낮에 장을 보니: 저녁은 장 보는 날(일)~다음 토, 아침은 다음 날(월)~다음 일(장 보기 전 아침)
+function dinDays(sun){ return PLAN_DAYS.filter(d=>d>=sun && d<=sun+6); }
+function bfDays(sun){ return PLAN_DAYS.filter(d=>d>=sun+1 && d<=sun+7); }
+function shopDays(sun){ return PLAN_DAYS.filter(d=>d>=sun && d<=sun+7); }
+let shopSel = (()=>{ const t=todayD||0; const f=SHOP_SUNDAYS.find(x=>x>=t); return f!==undefined?f:SHOP_SUNDAYS[SHOP_SUNDAYS.length-1]; })();
+let shopChecks = {};
+try{ shopChecks = JSON.parse(localStorage.getItem('sikdan-shop-v1')||'{}')||{}; }catch(e){ shopChecks = {}; }
+function saveChecks(){ try{ localStorage.setItem('sikdan-shop-v1', JSON.stringify(shopChecks)); }catch(e){} }
+
+function buildShop(){
+  const days = shopDays(shopSel);
+  const optBf = document.getElementById('shopBf').checked;
+  const optDin = document.getElementById('shopDin').checked;
+  const D = getDinner();
+  const items = {};
+  const add = (ing,label,d)=>{
+    if(!items[ing]) items[ing] = {name:ing, sec:secOf(ing), uses:[]};
+    items[ing].uses.push({label,d});
+  };
+  if(optDin) dinDays(shopSel).forEach(d=>{
+    DINNER_CATS.forEach(c=>{
+      const x = D[d][c.id];
+      if(x.k===1 && !x.none) ingOf(x.name).forEach(i=>add(i,x.name,d));
+    });
+  });
+  if(optBf) bfDays(shopSel).forEach(d=>{
+    const id = st.plan[d];
+    BF_ING[id].forEach(i=>add(i,'아침 '+BF.find(o=>o.id===id).name,d));
+  });
+  return {days, items};
+}
+function useText(uses){
+  const shown = uses.slice(0,5).map(u=>`${u.label} ${mdLabel(u.d).replace(/\(.\)/,'')}`);
+  return shown.join(' · ') + (uses.length>5 ? ` 외 ${uses.length-5}번` : '');
+}
+function renderShop(){
+  const sel = document.getElementById('shopSel');
+  if(!sel.options.length){
+    SHOP_SUNDAYS.forEach(s=>{
+      const dd = dinDays(s), bd = bfDays(s);
+      const o = document.createElement('option');
+      o.value = s;
+      const first = dd.length ? mdLabel(dd[0])+' 저녁' : '';
+      const last = bd.length ? mdLabel(bd[bd.length-1])+' 아침' : '';
+      o.textContent = `${mdLabel(s)} 장보기 → ${first} ~ ${last}`;
+      sel.appendChild(o);
+    });
+  }
+  sel.value = String(shopSel);
+
+  const {days, items} = buildShop();
+  const D = getDinner();
+  const list = Object.values(items);
+  const done = list.filter(x=>shopChecks[shopSel+'|'+x.name]).length;
+  document.getElementById('sumS').innerHTML =
+    `<div class="sumbox">🛒 살 재료<b>${list.length}가지</b><small style="color:var(--muted)">산 것 ${done} · 남은 것 ${list.length-done}</small></div>
+     <div class="sumbox">📅 이 장으로 먹는 끼니<b>저녁 ${dinDays(shopSel).length}일 · 아침 ${bfDays(shopSel).length}일</b><small style="color:var(--muted)">${days.length?mdLabel(days[0])+' 저녁 ~ '+mdLabel(days[days.length-1])+' 아침':'식단 없음'}</small></div>`;
+
+  // 재료 목록
+  const box = document.getElementById('shopList');
+  box.innerHTML = '';
+  if(!list.length){ box.innerHTML = '<div class="note">이 기간에는 식단이 없어요.</div>'; }
+  SECTIONS.forEach((title,si)=>{
+    const rows = list.filter(x=>x.sec===si).sort((a,b)=>b.uses.length-a.uses.length || a.name.localeCompare(b.name,'ko'));
+    if(!rows.length) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'ssec';
+    wrap.innerHTML = `<h3>${title} <small style="font-weight:400;color:var(--muted)">${rows.length}가지</small></h3>` + rows.map(x=>{
+      const key = shopSel+'|'+x.name;
+      return `<label class="srow${shopChecks[key]?' done':''}"><input type="checkbox" data-k="${esc(key)}"${shopChecks[key]?' checked':''}>
+        <span><span class="nm">${esc(x.name)}</span><span class="cnt">${x.uses.length}번</span>
+        <div class="use">${esc(useText(x.uses))}</div></span></label>`;
+    }).join('');
+    box.appendChild(wrap);
+  });
+  box.querySelectorAll('input[type=checkbox]').forEach(c=>{
+    c.onchange = ()=>{
+      const k = c.dataset.k;
+      if(c.checked) shopChecks[k]=true; else delete shopChecks[k];
+      saveChecks(); renderShop();
+    };
+  });
+
+  // 메뉴 한눈에
+  const menu = document.getElementById('shopMenu');
+  menu.innerHTML = '';
+  const dset = new Set(dinDays(shopSel)), bset = new Set(bfDays(shopSel));
+  days.forEach(d=>{
+    const bf = BF.find(o=>o.id===st.plan[d]);
+    const dn = DINNER_CATS.map(c=>{ const x=D[d][c.id]; return esc(x.name)+(x.k===1?'🆕':''); }).join(' · ');
+    const el = document.createElement('div');
+    el.className = 'mrow'+(d===todayD?' today':'');
+    el.innerHTML = `<b>${mdLabel(d)}</b>`
+      + (bset.has(d) ? `<span class="lbl">아침</span>${bf.em} ${bf.name}` : '')
+      + (dset.has(d) ? `<span class="lbl">저녁</span>${dn}` : '');
+    menu.appendChild(el);
+  });
+}
+document.getElementById('shopSel').onchange = e=>{ shopSel = +e.target.value; renderShop(); };
+document.getElementById('shopBf').onchange = ()=>renderShop();
+document.getElementById('shopDin').onchange = ()=>renderShop();
+document.getElementById('btnUncheck').onclick = ()=>{
+  Object.keys(shopChecks).forEach(k=>{ if(k.startsWith(shopSel+'|')) delete shopChecks[k]; });
+  saveChecks(); renderShop();
+};
+document.getElementById('btnCopy').onclick = async ()=>{
+  const {days, items} = buildShop();
+  const lines = [`🛒 ${mdLabel(shopSel)} 장보기 (${days.length?mdLabel(days[0])+'~'+mdLabel(days[days.length-1]):''} 메뉴)`];
+  SECTIONS.forEach((title,si)=>{
+    const rows = Object.values(items).filter(x=>x.sec===si && !shopChecks[shopSel+'|'+x.name]);
+    if(rows.length){ lines.push('', title); rows.forEach(x=>lines.push(`- ${x.name} (${x.uses.length}번)`)); }
+  });
+  const msg = document.getElementById('copyMsg');
+  try{ await navigator.clipboard.writeText(lines.join('\n')); msg.textContent='복사했어요'; }
+  catch(e){ msg.textContent='복사가 안 돼요. 목록을 직접 선택해서 복사해 주세요'; }
+  setTimeout(()=>{ msg.textContent=''; }, 2500);
+};
+
+// ===== 요리 목록 관리 =====
+const BASIC = ['소금','간장','참기름','들기름','식용유','마늘','다진마늘','깨','깨소금','설탕','후추','물','올리고당','물엿','맛술','국간장','액젓','식초'];
+const DISH_KEY = 'sikdan-dishes-v1';
+let dishState = {custom:[], off:{}, ing:{}, spicy:{}};
+try{ const t = JSON.parse(localStorage.getItem(DISH_KEY)||'null'); if(t) dishState = Object.assign(dishState, t); }catch(e){}
+let dishVer = 0;
+const CAT_NAME = {soup:'국·찌개', main:'메인', side:'밑반찬'};
+function saveDish(){ try{ localStorage.setItem(DISH_KEY, JSON.stringify(dishState)); }catch(e){} }
+function cleanIngs(arr){
+  return arr.map(x=>String(x).trim()).filter(x=>x && !BASIC.includes(x.replace(/\(.*?\)/g,'').trim()));
+}
+function parseIngs(text){ return cleanIngs(String(text).split(/[,，、\n]/)); }
+const SPICY_RE = /고추가루|고춧가루/;
+function guessSection(n){
+  const t = tagsOf([n]);
+  if(['소고기','돼지고기','닭고기','오리'].some(x=>t.has(x))) return 0;
+  if(['생선','오징어','새우','조개·꽃게'].some(x=>t.has(x))) return 1;
+  if(['달걀','두부','어묵'].some(x=>t.has(x))) return 3;
+  if(/고기|갈비|삼겹|목살|안심|등심|사태|양지|차돌|햄|소시지|베이컨/.test(n)) return 0;
+  if(/멸치|미역|다시마|파래|조기|명태|굴|홍합|해물|오징|꽃게|조개|낙지|문어|김$/.test(n)) return 1;
+  if(/만두|떡|면|국수|우동|치즈|우유|요구르트|순대|계란|달걀|메추리알|두부|어묵/.test(n)) return 3;
+  if(/가루|빵|소스|기름|전분|카레|밥|쌀/.test(n)) return 4;
+  return 2;
+}
+function secOf(i){ return ING_SEC[i]!=null ? ING_SEC[i] : guessSection(i); }
+function customDish(c){
+  const ings = cleanIngs(c.ings||[]).map(x=>x.replace(/\(.*?\)/g,'').trim()).filter(Boolean);
+  const tags = [...tagsOf([c.name, ...ings])];
+  const kw = [...new Set([c.name, ...ings])].filter(x=>x.length>=2 && !BASIC.includes(x));
+  return {name:c.name, cats:c.cats, tags, kw, mine:true, custom:true, spicy:!!c.spicy};
+}
+function allDishes(){ return DISHES.concat(dishState.custom.map(customDish)); }
+function isSpicy(x){ return !!dishState.spicy[x.name] || !!x.spicy; }
+function activeDishes(){ return allDishes().filter(x=>!dishState.off[x.name] && !isSpicy(x)); }
+function ingOf(name){
+  if(dishState.ing[name]) return dishState.ing[name];
+  const c = dishState.custom.find(x=>x.name===name);
+  if(c) return cleanIngs(c.ings||[]);
+  return DISH_ING[name]||[];
+}
+function dishChanged(){
+  saveDish(); dishVer++; dinCache.key='';
+  renderDish(); renderDn(); renderShop();
+}
+function renderDish(){
+  const all = allDishes();
+  const act = activeDishes();
+  const cnt = {soup:0, main:0, side:0};
+  act.forEach(x=>x.cats.forEach(c=>cnt[c]++));
+  const low = [];
+  if(cnt.soup<3) low.push('국·찌개'); if(cnt.main<4) low.push('메인'); if(cnt.side<6) low.push('밑반찬');
+  document.getElementById('sumDish').innerHTML =
+    `<div class="sumbox">🍲 국·찌개<b>${cnt.soup}가지</b></div><div class="sumbox">🍖 메인<b>${cnt.main}가지</b></div><div class="sumbox">🥗 밑반찬<b>${cnt.side}가지</b></div>`
+    + (low.length ? `<div class="note" style="flex-basis:100%;margin:0">⚠ ${low.join('·')} 메뉴가 적어서 같은 메뉴가 자주 나오거나 점심과 안 겹치는 날 빈칸이 생길 수 있어요.</div>` : '');
+  const box = document.getElementById('dishList');
+  box.innerHTML = '';
+  ['soup','main','side'].forEach(pc=>{
+    const rows = all.map((x,i)=>({x,i})).filter(r=>r.x.cats[0]===pc);
+    if(!rows.length) return;
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `<div class="who" style="margin:10px 0 4px">${CAT_NAME[pc]} <small style="color:var(--muted);font-weight:400">${rows.length}가지</small></div>` + rows.map(({x,i})=>{
+      const sp = isSpicy(x), off = !!dishState.off[x.name];
+      const src = x.custom ? '직접 추가' : (x.mine ? '알려주신 메뉴' : '초안 추가 메뉴');
+      return `<div class="dish${(off||sp)?' off':''}">
+        <label class="dtop"><input type="checkbox" data-act="use" data-i="${i}"${off?'':' checked'}${sp?' disabled':''}> <b>${esc(x.name)}</b>
+          <span class="dk">${x.cats.map(c=>CAT_NAME[c]).join('·')} · ${src}${sp?' · 🌶 고춧가루라 제외':''}</span></label>
+        <div class="use">재료: ${esc(ingOf(x.name).join(', ')||'(없음)')}</div>
+        <div class="dbtn"><button class="mini" data-act="edit" data-i="${i}">재료 수정</button>
+          <button class="mini" data-act="spicy" data-i="${i}">${sp?'🌶 표시 해제':'🌶 고춧가루 들어가요'}</button>
+          ${x.custom?`<button class="mini" data-act="del" data-i="${i}">삭제</button>`:''}</div></div>`;
+    }).join('');
+    box.appendChild(wrap);
+  });
+}
+document.getElementById('dishList').onclick = e=>{
+  const t = e.target.closest('[data-act]');
+  if(!t) return;
+  const all = allDishes();
+  const x = all[+t.dataset.i];
+  if(!x) return;
+  const act = t.dataset.act;
+  const ci = dishState.custom.findIndex(c=>c.name===x.name);
+  if(act==='use'){
+    if(t.checked) delete dishState.off[x.name]; else dishState.off[x.name]=true;
+    dishChanged();
+  }else if(act==='spicy'){
+    const now = isSpicy(x);
+    if(ci>=0) dishState.custom[ci].spicy = !now;
+    if(now){ delete dishState.spicy[x.name]; } else if(ci<0){ dishState.spicy[x.name]=true; }
+    dishChanged();
+  }else if(act==='edit'){
+    const v = prompt('사야 하는 재료를 쉼표로 적어 주세요 (기본 양념은 안 적어도 돼요)', ingOf(x.name).join(', '));
+    if(v===null) return;
+    const arr = parseIngs(v);
+    if(ci>=0) dishState.custom[ci].ings = arr; else dishState.ing[x.name] = arr;
+    if(SPICY_RE.test(v)){ if(ci>=0) dishState.custom[ci].spicy = true; else dishState.spicy[x.name] = true; }
+    dishChanged();
+  }else if(act==='del'){
+    if(!confirm(`'${x.name}'을(를) 목록에서 지울까요?`)) return;
+    dishState.custom.splice(ci,1);
+    delete dishState.off[x.name]; delete dishState.ing[x.name];
+    dishChanged();
+  }
+};
+function dMsg(text, err){ const m=document.getElementById('dMsg'); m.className = err?'okmsg errmsg':'okmsg'; m.textContent = text; }
+document.getElementById('dAdd').onclick = ()=>{
+  const name = document.getElementById('dName').value.trim();
+  const cats = ['soup','main','side'].filter(c=>document.getElementById('dC_'+c).checked);
+  const raw = document.getElementById('dIngs').value;
+  if(!name) return dMsg('요리 이름을 적어 주세요', true);
+  if(!cats.length) return dMsg('들어갈 자리를 하나 이상 골라 주세요', true);
+  if(allDishes().some(x=>x.name===name)) return dMsg('이미 목록에 있는 요리예요', true);
+  const spicy = document.getElementById('dSpicy').checked || SPICY_RE.test(raw);
+  dishState.custom.push({name, cats, ings:parseIngs(raw), spicy});
+  document.getElementById('dName').value=''; document.getElementById('dIngs').value=''; document.getElementById('dSpicy').checked=false;
+  dishChanged();
+  dMsg(spicy ? `'${name}'을(를) 추가했어요. 고춧가루가 들어가서 지금은 식단에서 빼 뒀어요.`
+             : `'${name}'을(를) 추가했어요. 저녁 식단과 장보기 목록이 새로 짜였어요.`);
+};
+
+renderWeeksAll(); renderBf(); renderDn(); renderDish(); renderShop();
+</script>
+</body>
+</html>
